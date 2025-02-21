@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.10.0)
-project(Learning_OpenGL VERSION 0.1.0)
+project(TETRIS VERSION 0.1.0)
 
 find_package(OpenGL REQUIRED)
 
-add_executable(Learning_OpenGL 
+add_executable(TETRIS 
                 src/main.cpp
                 src/glad.c
                 src/Shader.hpp
@@ -12,7 +12,7 @@ add_executable(Learning_OpenGL
                 src/stb_image_implementation.cpp
 )
 
-target_link_libraries(Learning_OpenGL 
+target_link_libraries(TETRIS 
                                 glfw
                                 OpenGL::GL
 )

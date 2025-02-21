@@ -7,16 +7,16 @@
 
 #include <iostream>
 
-int win_width = 800, win_height = 600;
+void processInput(GLFWwindow* window);
+void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
-// the ratio is used to get the vertices to a square shape
-float ratio = static_cast<float>(win_width) / static_cast<float>(win_height);
+unsigned int win_width = 1920, win_height = 1080;
 
-float vertices[] = {
-    -0.5f / ratio,  0.5f, 0.0f,
-    -0.5f / ratio, -0.5f, 0.0f,
-     0.5f / ratio,  0.5f, 0.0f,
-     0.5f / ratio, -0.5f, 0.0f  
+const float vertices[] = {
+    -0.5f,  0.5f, 0.0f,
+    -0.5f, -0.5f, 0.0f,
+     0.5f,  0.5f, 0.0f,
+     0.5f, -0.5f, 0.0f
 };
 
 const unsigned int indices[] = {
@@ -24,39 +24,10 @@ const unsigned int indices[] = {
     1, 2, 3
 };
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
-    glViewport(0, 0, width, height);
-    // calculate new ration based on new window width and height
-    const float new_ratio = static_cast<float>(width) / static_cast<float>(height);
-    
-    // iterate through vertices jumping over the y and z coordinates
-    for (int i = 0; i < (sizeof(vertices) / sizeof(*vertices)); i += 3) {
-        // multiply the x coordinate by the old ratio so we get back the normal value
-        vertices[i] *= ratio;
-        // divide it by the new ratio so it adjusts to new window size
-        vertices[i] /= new_ratio;
-    }
-
-    // set ratio, win_width and win_height to the new values
-    ratio = new_ratio;
-    win_width = width, win_height = height;
-
-    // update VBO data with the vertices array newly adjusted to the window size
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_DYNAMIC_DRAW);
-}
-
-void processInput(GLFWwindow* window) {
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
-        glfwSetWindowShouldClose(window, true);
-    }
-}
-
 int main() {
 
-    std::cout << ratio;
-
     if (!glfwInit()) {
-        std::cerr << "Failed to initialize GLFW" << std::endl;
+        std::cerr << "GLFW couldn't initialize...\n";
         return -1;
     }
 
@@ -64,28 +35,35 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
-    GLFWwindow* window = glfwCreateWindow(win_width, win_height, "Tetris Time!!!", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(win_width, win_height, "TETRIS TIME!!!", glfwGetPrimaryMonitor(), NULL);
 
     if (!window) {
-        std::cerr << "Failed to create window" << std::endl;
+        std::cerr << "GLFW window couldn't initialize...\n";
         glfwTerminate();
         return -1;
     }
 
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    
+    const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+
+    win_width = mode->width;
+    win_height = mode->height;
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
-        std::cerr << "Failed to initialize GLAD" << std::endl;
+        std::cerr << "GLAD couldn't initialize...\n";
         glfwTerminate();
         return -1;
     }
 
-    glClearColor(0.3f, 0.3f, 0.3f, 1.0f);
+    glViewport(0, 0, win_width, win_height);
+
+    glClearColor(0.0f, 0.4f, 0.6f, 1.0f);
 
     Shader shader = {"../src/shaders/vertex_shader.glsl", "../src/shaders/fragment_shader.glsl"};
 
-    unsigned int VAO, VBO, EBO;
+    unsigned int VBO, VAO, EBO;
 
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
@@ -93,7 +71,7 @@ int main() {
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
 
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     glGenBuffers(1, &EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
@@ -103,13 +81,14 @@ int main() {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(0));
     glEnableVertexAttribArray(0);
 
-    glm::mat4 trans = glm::mat4(1.0f);
-    trans = glm::translate(trans, glm::vec3(-0.5f, 0.0f, 0.0f));
-    trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));
+    //glBindVertexArray(0);
+    /*glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);*/
 
-    while(!glfwWindowShouldClose(window)) {
+    
+
+    while (!glfwWindowShouldClose(window)) {
         processInput(window);
-        glfwSwapBuffers(window);
 
         glClear(GL_COLOR_BUFFER_BIT);
 
@@ -117,13 +96,23 @@ int main() {
         glBindVertexArray(VAO);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
-        glUniformMatrix4fv(glGetUniformLocation(shader.programId, "trans"), 1, GL_FALSE, glm::value_ptr(trans));
-
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
+        glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
     glfwTerminate();
     return 0;
+}
+
+void processInput(GLFWwindow* window) {
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+        glfwSetWindowShouldClose(window, true);
+    }
+}
+
+void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+    glViewport(0, 0, width, height);
+    win_width = width, win_height = height;
 }
