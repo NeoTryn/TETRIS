@@ -10,7 +10,10 @@
 void processInput(GLFWwindow* window);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
-unsigned int win_width = 1920, win_height = 1080;
+float win_width, win_height;
+const float frustum_width = 800.0f, frustum_height = 600.0f;
+
+float ratio;
 
 const float vertices[] = {
     -0.5f,  0.5f, 0.0f,
@@ -35,6 +38,11 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
+    const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+
+    win_width = mode->width;
+    win_height = mode->height;
+
     GLFWwindow* window = glfwCreateWindow(win_width, win_height, "TETRIS TIME!!!", glfwGetPrimaryMonitor(), NULL);
 
     if (!window) {
@@ -45,11 +53,10 @@ int main() {
 
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-    
-    const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 
-    win_width = mode->width;
-    win_height = mode->height;
+    std::cout << win_width << " " << win_height << "\n";
+
+    ratio = frustum_width / frustum_height;
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         std::cerr << "GLAD couldn't initialize...\n";
@@ -85,7 +92,18 @@ int main() {
     /*glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);*/
 
+    glm::mat4 model = glm::mat4(1.0f), projection = glm::mat4(1.0f), view = glm::mat4(1.0f);
+
+    projection = glm::ortho(0.0f, frustum_width, frustum_height, 0.0f, -1.0f, 1.0f);
+    //view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
     
+    //projection = glm::perspective(glm::radians(90.0f), win_width / win_height, 0.1f, 100.0f);
+
+    model = glm::translate(model, glm::vec3(400.0f, 300.0f, 0.0f));
+
+    model = glm::scale(model, glm::vec3(20.0f, 20.0f, 20.0f));
+
+    model = glm::scale(model, glm::vec3(1 / ratio, 1.0f, 1.0f));
 
     while (!glfwWindowShouldClose(window)) {
         processInput(window);
@@ -95,6 +113,10 @@ int main() {
         shader.use();
         glBindVertexArray(VAO);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+
+        glUniformMatrix4fv(glGetUniformLocation(shader.programId, "model"), 1, GL_FALSE, glm::value_ptr(model));
+        glUniformMatrix4fv(glGetUniformLocation(shader.programId, "proj"), 1, GL_FALSE, glm::value_ptr(projection));
+        glUniformMatrix4fv(glGetUniformLocation(shader.programId, "view"), 1, GL_FALSE, glm::value_ptr(view));
 
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
