@@ -1,9 +1,5 @@
-#include "Shader.hpp"
+#include "Renderer.hpp"
 #include <GLFW/glfw3.h>
-
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 #include <iostream>
 
@@ -68,7 +64,7 @@ int main() {
 
     glClearColor(0.0f, 0.4f, 0.6f, 1.0f);
 
-    Shader shader = {"../src/shaders/vertex_shader.glsl", "../src/shaders/fragment_shader.glsl"};
+    /*Shader shader("../src/shaders/vertex_shader.glsl", "../src/shaders/fragment_shader.glsl");
 
     unsigned int VBO, VAO, EBO;
 
@@ -86,7 +82,7 @@ int main() {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)(0));
-    glEnableVertexAttribArray(0);
+    glEnableVertexAttribArray(0);*/
 
     //glBindVertexArray(0);
     /*glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -105,12 +101,15 @@ int main() {
 
     model = glm::scale(model, glm::vec3(1 / ratio, 1.0f, 1.0f));
 
+    Renderer renderer;
+    renderer.init(vertices, indices);
+
     while (!glfwWindowShouldClose(window)) {
         processInput(window);
 
         glClear(GL_COLOR_BUFFER_BIT);
 
-        shader.use();
+        /*shader.use();
         glBindVertexArray(VAO);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
 
@@ -118,7 +117,9 @@ int main() {
         glUniformMatrix4fv(glGetUniformLocation(shader.programId, "proj"), 1, GL_FALSE, glm::value_ptr(projection));
         glUniformMatrix4fv(glGetUniformLocation(shader.programId, "view"), 1, GL_FALSE, glm::value_ptr(view));
 
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);*/
+
+        renderer.render(projection, glm::vec3(400.0f, 300.0f, 0.0f), 0.0f, glm::vec3(0.0f), glm::vec3(20.0f / ratio, 20.0f, 20.0f));
 
         glfwSwapBuffers(window);
         glfwPollEvents();

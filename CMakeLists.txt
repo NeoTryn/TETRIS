@@ -8,7 +8,7 @@ add_executable(TETRIS
                 src/glad.c
                 src/Shader.hpp
                 src/Shader.cpp
-                src/stb_image.h
+                #src/stb_image.h
                 src/stb_image_implementation.cpp
 )
 
