@@ -14,6 +14,7 @@ public:
 
     unsigned int programId, vShaderId, fShaderId;
 
+    Shader() = default;
     Shader(std::string vShaderPath, std::string fShaderPath);
 
     void use();
