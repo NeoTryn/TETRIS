@@ -10,6 +10,8 @@ add_executable(TETRIS
                 src/Shader.cpp
                 #src/stb_image.h
                 src/stb_image_implementation.cpp
+                src/Game.hpp
+                src/Game.cpp
 )
 
 target_link_libraries(TETRIS 

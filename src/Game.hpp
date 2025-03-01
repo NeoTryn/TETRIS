@@ -18,16 +18,15 @@ private:
     unsigned int VAO;
     unsigned int EBO;
 
-    unsigned short win_width = 800, win_height = 600;
+    int win_width = 800, win_height = 600;
     float frustum_width = 800, frustum_height = 600;
 
     GLFWwindow* window;
 
-    static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
     static void processInput(GLFWwindow* window);
 
 public:
-    Game(const char* vertPath, const char* fragPath);
+    Game(GLFWframebuffersizefun callback);
 
     void init();
     

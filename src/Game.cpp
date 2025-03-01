@@ -1,20 +1,42 @@
 #include "Game.hpp"
 
-Game::Game(const char* vertPath, const char* fragPath) {
-    Game::shader = { vertPath, fragPath };
+Game::Game(GLFWframebuffersizefun callback) {
     Game::state = GAME_STATE::MENU;
 
     if (!glfwInit()) {
-        std::cerr << "GLFW couldn't initialize\n";
+        std::cout << "GLFW couldn't initialize\n";
     }
 
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-}
 
-void Game::framebuffer_size_callback(GLFWwindow* window, int width, int height) {
-    glViewport(0, 0, width, height);
+    Game::window = glfwCreateWindow(Game::win_width, Game::win_height, "TETRIS TIME!!!", glfwGetPrimaryMonitor(), nullptr);
+
+    if (!Game::window) {
+        std::cout << "Window couldn't initialize...\n";
+    }
+
+    //glfwGetWindowSize(Game::window, &(Game::win_width), &(Game::win_height));
+
+    const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+
+    Game::win_width = mode->width;
+    Game::win_height = mode->height;
+
+    std::cout << Game::win_width << " " << Game::win_height << "\n";
+
+    glfwMakeContextCurrent(Game::window);
+    glfwSetFramebufferSizeCallback(Game::window, callback);
+
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+        std::cout << "GLAD couldn't initialize...\n";
+    }
+
+    glViewport(0, 0, Game::win_width, Game::win_height);
+    glClearColor(0.2f, 0.45f, 0.65f, 1.0f);
+
+    Game::shader = {"../src/shaders/vertex_shader.glsl", "../src/shaders/fragment_shader.glsl"};
 }
 
 void Game::processInput(GLFWwindow* window) {
@@ -26,14 +48,14 @@ void Game::processInput(GLFWwindow* window) {
 void Game::init() {
     unsigned int VBO;
 
-    const float vertices[] = {
+    float vertices[] = {
         -0.5f,  0.5f, 0.0f, // upper left
         -0.5f, -0.5f, 0.0f, // lower left
          0.5f,  0.5f, 0.0f, // upper right
          0.5f, -0.5f, 0.0f  // lower right
     };
 
-    const unsigned int indices[] = {
+    unsigned int indices[] = {
         0, 1, 2,
         1, 2, 3
     };
@@ -72,13 +94,19 @@ void Game::render() {
 }
 
 void Game::update() {
-    std::cout << "Updating\n";
+    glfwSwapBuffers(Game::window);
+    glfwPollEvents();
 }
 
 void Game::clear() {
-    std::cout << "Clearing\n";
+    Game::processInput(Game::window);
+    glClear(GL_COLOR_BUFFER_BIT);
 }
 
 void Game::run() {
-
+    while (!glfwWindowShouldClose(Game::window)) {
+        Game::clear();
+        Game::render();
+        Game::update();
+    }
 }

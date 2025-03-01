@@ -1,10 +1,15 @@
 #include "Game.hpp"
+#include "Shader.hpp"
 
 #include <iostream>
 
+void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
+    glViewport(0, 0, width, height);
+}
+
 int main() {
 
-    Game game = { "../src/shaders/vertex_shader.glsl", "../src/shaders/fragment_shaders.glsl" };
+    Game game = { framebuffer_size_callback };
 
     game.init();
 
