@@ -1,6 +1,10 @@
 #include "Shader.hpp"
 #include <GLFW/glfw3.h>
 
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+
 #ifndef GAME_HPP
 #define GAME_HPP
 
@@ -21,6 +25,8 @@ private:
     int win_width = 800, win_height = 600;
     float frustum_width = 800, frustum_height = 600;
 
+    float ratio;
+
     GLFWwindow* window;
 
     static void processInput(GLFWwindow* window);
@@ -32,7 +38,6 @@ public:
     
     void render();
     void update();
-    void clear();
 
     void run();
 };

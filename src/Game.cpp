@@ -24,6 +24,8 @@ Game::Game(GLFWframebuffersizefun callback) {
     Game::win_width = mode->width;
     Game::win_height = mode->height;
 
+    Game::ratio = static_cast<float>(Game::win_width / Game::win_height);
+
     std::cout << Game::win_width << " " << Game::win_height << "\n";
 
     glfwMakeContextCurrent(Game::window);
@@ -96,17 +98,24 @@ void Game::render() {
 void Game::update() {
     glfwSwapBuffers(Game::window);
     glfwPollEvents();
-}
 
-void Game::clear() {
     Game::processInput(Game::window);
     glClear(GL_COLOR_BUFFER_BIT);
+
+    Game::shader.use();
+
+    glm::mat4 model = glm::mat4(1.0f);
+
+    std::cout << Game::win_width / Game::win_height << "\n";
+
+    model = glm::scale(model, glm::vec3(1.0f / Game::ratio, 1.0f, 1.0f));
+
+    glUniformMatrix4fv(glGetUniformLocation(Game::shader.programId, "model"), 1, GL_FALSE, glm::value_ptr(model));
 }
 
 void Game::run() {
     while (!glfwWindowShouldClose(Game::window)) {
-        Game::clear();
-        Game::render();
         Game::update();
+        Game::render();
     }
 }
