@@ -24,7 +24,7 @@ Game::Game(GLFWframebuffersizefun callback) {
     Game::win_width = mode->width;
     Game::win_height = mode->height;
 
-    Game::ratio = static_cast<float>(Game::win_width / Game::win_height);
+    Game::ratio = static_cast<float>(Game::frustum_width) / static_cast<float>(Game::frustum_height);
 
     std::cout << Game::win_width << " " << Game::win_height << "\n";
 
@@ -93,24 +93,29 @@ void Game::render() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Game::EBO);
 
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+    glfwSwapBuffers(Game::window);
+    glfwPollEvents();
 }
 
 void Game::update() {
-    glfwSwapBuffers(Game::window);
-    glfwPollEvents();
-
     Game::processInput(Game::window);
+
     glClear(GL_COLOR_BUFFER_BIT);
 
     Game::shader.use();
 
-    glm::mat4 model = glm::mat4(1.0f);
+    glm::mat4 model = glm::mat4(1.0f), projection = glm::mat4(1.0f);
 
-    std::cout << Game::win_width / Game::win_height << "\n";
+    model = glm::translate(model, glm::vec3(400.0f, 300.0f, 0.0f));
 
+    model = glm::scale(model, glm::vec3(20.0f, 20.0f, 20.0f));
     model = glm::scale(model, glm::vec3(1.0f / Game::ratio, 1.0f, 1.0f));
 
+    projection = glm::ortho(0.0f, Game::frustum_width, Game::frustum_height, 0.0f);
+
     glUniformMatrix4fv(glGetUniformLocation(Game::shader.programId, "model"), 1, GL_FALSE, glm::value_ptr(model));
+    glUniformMatrix4fv(glGetUniformLocation(Game::shader.programId, "proj"), 1, GL_FALSE, glm::value_ptr(projection));
 }
 
 void Game::run() {

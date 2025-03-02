@@ -1,9 +1,5 @@
-#include "Shader.hpp"
+#include "Tetromino_Renderer.hpp"
 #include <GLFW/glfw3.h>
-
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
 
 #ifndef GAME_HPP
 #define GAME_HPP

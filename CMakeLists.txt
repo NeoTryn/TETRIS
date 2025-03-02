@@ -12,6 +12,8 @@ add_executable(TETRIS
                 src/stb_image_implementation.cpp
                 src/Game.hpp
                 src/Game.cpp
+                src/Tetromino_Renderer.hpp
+                src/Tetromino_Renderer.cpp
 )
 
 target_link_libraries(TETRIS 
