@@ -84,15 +84,19 @@ void Game::init() {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     glDeleteBuffers(1, &VBO);
+
+    Game::renderer = { Game::VAO, Game::EBO, Game::shader, Game::block_size, Game::ratio };
 }
 
 void Game::render() {
     Game::shader.use();
 
-    glBindVertexArray(Game::VAO);
+    /*glBindVertexArray(Game::VAO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, Game::EBO);
 
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);*/
+
+    Game::renderer.draw_tetromino(BLOCK_TYPE::I);
 
     glfwSwapBuffers(Game::window);
     glfwPollEvents();
@@ -114,7 +118,6 @@ void Game::update() {
 
     projection = glm::ortho(0.0f, Game::frustum_width, Game::frustum_height, 0.0f);
 
-    glUniformMatrix4fv(glGetUniformLocation(Game::shader.programId, "model"), 1, GL_FALSE, glm::value_ptr(model));
     glUniformMatrix4fv(glGetUniformLocation(Game::shader.programId, "proj"), 1, GL_FALSE, glm::value_ptr(projection));
 }
 

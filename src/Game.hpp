@@ -13,6 +13,7 @@ enum GAME_STATE {
 class Game {
 private:
     Shader shader;
+    Tetromino_Renderer renderer;
     GAME_STATE state;
 
     unsigned int VAO;
@@ -22,6 +23,7 @@ private:
     float frustum_width = 800, frustum_height = 600;
 
     float ratio;
+    const float block_size = 20.0f;
 
     GLFWwindow* window;
 

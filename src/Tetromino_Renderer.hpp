@@ -21,10 +21,11 @@ class Tetromino_Renderer {
 private:
     unsigned int VAO, EBO;
     Shader shader;
-    float block_size;
+    float block_size, ratio;
 
 public:
-    Tetromino_Renderer(unsigned int VAO, unsigned int EBO, Shader shader, float block_size);
+    Tetromino_Renderer() = default;
+    Tetromino_Renderer(unsigned int VAO, unsigned int EBO, Shader shader, float block_size, float ratio);
 
     void draw_tetromino(BLOCK_TYPE type);
 };
