@@ -85,7 +85,7 @@ void Game::init() {
 
     glDeleteBuffers(1, &VBO);
 
-    Game::renderer = { Game::VAO, Game::EBO, Game::shader, Game::block_size, Game::ratio };
+    Game::renderer = { Game::VAO, Game::EBO, Game::shader, Game::block_size, Game::ratio, Game::frustum_width, Game::frustum_height };
 }
 
 void Game::render() {
@@ -96,7 +96,8 @@ void Game::render() {
 
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);*/
 
-    Game::renderer.draw_tetromino(BLOCK_TYPE::I);
+    Game::renderer.draw_field();
+    Game::renderer.draw_tetromino(BLOCK_TYPE::I, glm::vec3(400.0f, 300.0f, 0.0f), 0.0f, glm::vec3(0.0f));
 
     glfwSwapBuffers(Game::window);
     glfwPollEvents();
@@ -109,14 +110,9 @@ void Game::update() {
 
     Game::shader.use();
 
-    glm::mat4 model = glm::mat4(1.0f), projection = glm::mat4(1.0f);
+    glm::mat4 projection = glm::mat4(1.0f);
 
-    model = glm::translate(model, glm::vec3(400.0f, 300.0f, 0.0f));
-
-    model = glm::scale(model, glm::vec3(20.0f, 20.0f, 20.0f));
-    model = glm::scale(model, glm::vec3(1.0f / Game::ratio, 1.0f, 1.0f));
-
-    projection = glm::ortho(0.0f, Game::frustum_width, Game::frustum_height, 0.0f);
+    projection = glm::ortho(0.0f, Game::frustum_width, Game::frustum_height, 0.0f, -1.0f, 1.0f);
 
     glUniformMatrix4fv(glGetUniformLocation(Game::shader.programId, "proj"), 1, GL_FALSE, glm::value_ptr(projection));
 }
